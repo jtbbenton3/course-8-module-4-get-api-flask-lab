@@ -3,23 +3,25 @@ from data import products
 
 app = Flask(__name__)
 
-# TODO: Implement homepage route that returns a welcome message
-
-@app.route("/")
+@app.route("/", methods=["GET"])
 def home():
-    pass  # TODO: Return a welcome message
+    return jsonify({"message": "Welcome to the Product API"}), 200
 
-# TODO: Implement GET /products route that returns all products or filters by category
-
-@app.route("/products")
+@app.route("/products", methods=["GET"])
 def get_products():
-    pass  # TODO: Return all products or filter by ?category=
+    category = request.args.get("category")
+    if category:
+        wanted = category.strip().lower()
+        filtered = [p for p in products if p.get("category", "").lower() == wanted]
+        return jsonify(filtered), 200
+    return jsonify(products), 200
 
-# TODO: Implement GET /products/<id> route that returns a specific product by ID or 404
-
-@app.route("/products/<int:id>")
+@app.route("/products/<int:id>", methods=["GET"])
 def get_product_by_id(id):
-    pass  # TODO: Return product by ID or 404
+    for p in products:
+        if p.get("id") == id:
+            return jsonify(p), 200
+    return jsonify({"error": "Product not found"}), 404
 
 if __name__ == "__main__":
     app.run(debug=True)
